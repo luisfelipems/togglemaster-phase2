@@ -1,0 +1,1 @@
+eksctl create cluster --name togglemaster-cluster --version 1.36 --nodegroup-name togglemaster-nodegroup --node-type t3.large --nodes 2 --nodes-min 1 --nodes-max 4 --region sa-east-1

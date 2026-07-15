@@ -1,0 +1,51 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+.venv/
+venv/
+.pytest_cache/
+
+# Go
+bin/
+*.exe
+*.test
+
+# Environment and secrets
+.env
+.env.*
+*.env
+*.pem
+*.key
+*.p12
+*.pfx
+*.cer
+*.crt
+*.secrets
+*.secret
+*.token
+
+# Docker / Kubernetes / infra
+*.log
+*.yaml~
+*.yml~
+*.json~
+*.conf~
+
+# Local configs and credentials
+credentials*
+secrets*
+config-local*
+local-*.json
+local-*.yaml
+local-*.yml
+
+# IDEs
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db

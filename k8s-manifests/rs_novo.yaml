@@ -1,0 +1,96 @@
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  annotations:
+    deployment.kubernetes.io/desired-replicas: "2"
+    deployment.kubernetes.io/max-replicas: "3"
+    deployment.kubernetes.io/revision: "14"
+  creationTimestamp: "2026-07-14T18:43:21Z"
+  generation: 3
+  labels:
+    app: auth-service
+    pod-template-hash: 545496496b
+  name: auth-service-545496496b
+  namespace: togglemaster
+  ownerReferences:
+  - apiVersion: apps/v1
+    blockOwnerDeletion: true
+    controller: true
+    kind: Deployment
+    name: auth-service
+    uid: 358a8846-2606-460f-aae7-a18779ba65b1
+  resourceVersion: "83317"
+  uid: 29bef0e7-4e2c-48cb-b603-8d5ceb0bd6eb
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: auth-service
+      pod-template-hash: 545496496b
+  template:
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/restartedAt: "2026-07-14T15:44:35-03:00"
+      labels:
+        app: auth-service
+        pod-template-hash: 545496496b
+    spec:
+      containers:
+      - env:
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              key: DATABASE_URL
+              name: db-auth-credentials
+        - name: MASTER_KEY
+          valueFrom:
+            secretKeyRef:
+              key: MASTER_KEY
+              name: db-auth-credentials
+        - name: DB_HOST
+          valueFrom:
+            configMapKeyRef:
+              key: AUTH_DB_HOST
+              name: app-config
+        - name: DB_PORT
+          valueFrom:
+            configMapKeyRef:
+              key: AUTH_DB_PORT
+              name: app-config
+        - name: DB_NAME
+          valueFrom:
+            configMapKeyRef:
+              key: AUTH_DB_NAME
+              name: app-config
+        - name: DB_USER
+          value: postgres
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: DB_PASSWORD
+              name: db-auth-credentials
+        image: 905418203619.dkr.ecr.sa-east-1.amazonaws.com/auth-service:latest
+        imagePullPolicy: IfNotPresent
+        name: auth-service
+        ports:
+        - containerPort: 8005
+          protocol: TCP
+        resources:
+          limits:
+            cpu: 500m
+            memory: 512Mi
+          requests:
+            cpu: 250m
+            memory: 256Mi
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+status:
+  fullyLabeledReplicas: 2
+  observedGeneration: 3
+  replicas: 2
+  terminatingReplicas: 0

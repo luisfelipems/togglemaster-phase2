@@ -1,0 +1,35 @@
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: analytics-service-scaler
+  namespace: togglemaster
+spec:
+  scaleTargetRef:
+    name: evaluation-service  
+  minReplicaCount: 1          
+  maxReplicaCount: 10
+  triggers:
+    - type: aws-sqs-queue
+      metadata:
+       
+        queueURL: https://sqs.sa-east-1.amazonaws.com/905418203619/togglemaster-queue 
+        queueLength: "5"
+        awsRegion: "sa-east-1"
+      authenticationRef:
+        name: aws-sqs-auth
+---
+# O TriggerAuthentication parece correto, assumindo que o secret 'aws-credentials' 
+# existe no namespace 'togglemaster' com as chaves certas.
+apiVersion: keda.sh/v1alpha1
+kind: TriggerAuthentication
+metadata:
+  name: aws-sqs-auth
+  namespace: togglemaster
+spec:
+  secretTargetRef:
+    - parameter: awsAccessKeyID
+      name: aws-credentials
+      key: AWS_ACCESS_KEY_ID
+    - parameter: awsSecretAccessKey
+      name: aws-credentials
+      key: AWS_SECRET_ACCESS_KEY

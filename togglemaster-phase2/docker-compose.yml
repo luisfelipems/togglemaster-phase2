@@ -1,0 +1,154 @@
+services:
+
+  # ── AUTH SERVICE (Go) ──────────────────────────────────────────
+  auth-service:
+    build: ./auth-service
+    container_name: auth-service
+    ports:
+      - "8001:8001"
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@auth-postgres:5432/auth_db?sslmode=disable
+      MASTER_KEY: minha-chave-secreta-local
+    depends_on:
+      - auth-postgres
+    networks:
+      - togglemaster
+
+  auth-postgres:
+    image: postgres:15
+    container_name: auth-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: auth_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - auth-db-volume:/var/lib/postgresql/data
+    networks:
+      - togglemaster
+
+  # ── FLAG SERVICE (Python) ──────────────────────────────────────
+  flag-service:
+    build: ./flag-service
+    container_name: flag-service
+    ports:
+      - "8002:8002"
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@flag-postgres:5432/flag_db?sslmode=disable
+      AUTH_SERVICE_URL: http://auth-service:8001
+    depends_on:
+      - flag-postgres
+    networks:
+      - togglemaster
+
+  flag-postgres:
+    image: postgres:15
+    container_name: flag-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: flag_db
+    ports:
+      - "5433:5432"
+    volumes:
+      - flag-db-volume:/var/lib/postgresql/data
+    networks:
+      - togglemaster
+
+  # ── TARGETING SERVICE (Python) ─────────────────────────────────
+  targeting-service:
+    build: ./targeting-service
+    container_name: targeting-service
+    ports:
+      - "8003:8003"
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@targeting-postgres:5432/targeting_db?sslmode=disable
+      AUTH_SERVICE_URL: http://auth-service:8001
+    depends_on:
+      - targeting-postgres
+    networks:
+      - togglemaster
+
+  targeting-postgres:
+    image: postgres:15
+    container_name: targeting-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: targeting_db
+    ports:
+      - "5434:5432"
+    volumes:
+      - targeting-db-volume:/var/lib/postgresql/data
+    networks:
+      - togglemaster
+
+  # ── EVALUATION SERVICE (Go) ────────────────────────────────────
+  evaluation-service:
+    build: ./evaluation-service
+    container_name: evaluation-service
+    ports:
+      - "8004:8004"
+    environment:
+      FLAG_SERVICE_URL: http://flag-service:8002
+      TARGETING_SERVICE_URL: http://targeting-service:8003
+      REDIS_URL: redis://redis:6379
+      SERVICE_API_KEY: minha-chave-secreta-local
+      AWS_SQS_URL: https://sqs.sa-east-1.amazonaws.com/905418203619/togglemaster-queue
+      AWS_REGION: sa-east-1
+      AWS_ACCESS_KEY_ID: REPLACE_WITH_AWS_ACCESS_KEY_ID
+      AWS_SECRET_ACCESS_KEY: REPLACE_WITH_AWS_SECRET_ACCESS_KEY
+    depends_on:
+      - redis
+      - flag-service
+      - targeting-service
+    networks:
+      - togglemaster
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+    networks:
+      - togglemaster
+
+  # ── ANALYTICS SERVICE (Python) ─────────────────────────────────
+  analytics-service:
+    build: ./analytics-service
+    container_name: analytics-service
+    ports:
+      - "8005:8005"
+    environment:
+      AWS_REGION: sa-east-1
+      AWS_ACCESS_KEY_ID: test
+      AWS_SECRET_ACCESS_KEY: test
+      AWS_SQS_URL: https://sqs.sa-east-1.amazonaws.com/905418203619/togglemaster-queue
+      AWS_DYNAMODB_TABLE: analytics-events
+      SQS_ENDPOINT_URL: http://localstack:4566
+      DYNAMODB_ENDPOINT_URL: http://localstack:4566
+    depends_on:
+      - localstack
+    networks:
+      - togglemaster
+
+  localstack:
+    image: localstack/localstack:2.3.2
+    container_name: localstack
+    ports:
+      - "4566:4566"
+    environment:
+      SERVICES: sqs,dynamodb
+      DEBUG: 0
+    networks:
+      - togglemaster
+
+networks:
+  togglemaster:
+    driver: bridge
+
+volumes:
+  auth-db-volume:
+  flag-db-volume:
+  targeting-db-volume:

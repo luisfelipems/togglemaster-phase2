@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flag-service
+  namespace: togglemaster
+  labels:
+    app: flag-service
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: flag-service
+  template:
+    metadata:
+      labels:
+        app: flag-service
+    spec:
+      containers:
+        - name: flag-service
+          image: 905418203619.dkr.ecr.sa-east-1.amazonaws.com/flag-service:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8002
+          env:
+            - name: DB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: FLAG_DB_HOST
+            - name: DB_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: FLAG_DB_PORT
+            - name: DB_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: FLAG_DB_NAME
+            - name: DB_USER
+              value: "postgres"
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-flag-credentials
+                  key: DB_PASSWORD
+            - name: AWS_REGION
+              value: "sa-east-1"
+            - name: AWS_SQS_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: SQS_QUEUE_URL
+            - name: AWS_DYNAMODB_TABLE
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: DYNAMODB_TABLE

@@ -1,0 +1,104 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "7"
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{},"labels":{"app":"evaluation-service"},"name":"evaluation-service","namespace":"togglemaster"},"spec":{"replicas":2,"selector":{"matchLabels":{"app":"evaluation-service"}},"template":{"metadata":{"labels":{"app":"evaluation-service"}},"spec":{"containers":[{"env":[{"name":"REDIS_HOST","valueFrom":{"configMapKeyRef":{"key":"REDIS_HOST","name":"app-config"}}},{"name":"REDIS_PORT","valueFrom":{"configMapKeyRef":{"key":"REDIS_PORT","name":"app-config"}}}],"image":"905418203619.dkr.ecr.sa-east-1.amazonaws.com/evaluation-service:latest","imagePullPolicy":"IfNotPresent","livenessProbe":{"httpGet":{"path":"/health","port":8004},"initialDelaySeconds":10,"periodSeconds":10},"name":"evaluation-service","ports":[{"containerPort":8004}],"readinessProbe":{"httpGet":{"path":"/ready","port":8004}},"resources":{"limits":{"cpu":"1000m","memory":"1Gi"},"requests":{"cpu":"500m","memory":"512Mi"}}}]}}}}
+  creationTimestamp: "2026-07-14T14:13:42Z"
+  generation: 7
+  labels:
+    app: evaluation-service
+  name: evaluation-service
+  namespace: togglemaster
+  resourceVersion: "43228"
+  uid: 005907f4-3372-4592-92dc-c842de18a388
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 2
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: evaluation-service
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/restartedAt: "2026-07-14T13:01:44-03:00"
+      labels:
+        app: evaluation-service
+    spec:
+      containers:
+      - env:
+        - name: REDIS_HOST
+          valueFrom:
+            configMapKeyRef:
+              key: REDIS_HOST
+              name: app-config
+        - name: REDIS_PORT
+          valueFrom:
+            configMapKeyRef:
+              key: REDIS_PORT
+              name: app-config
+        image: 905418203619.dkr.ecr.sa-east-1.amazonaws.com/evaluation-service:latest
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /health
+            port: 8004
+            scheme: HTTP
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
+        name: evaluation-service
+        ports:
+        - containerPort: 8004
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /ready
+            port: 8004
+            scheme: HTTP
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
+        resources:
+          limits:
+            cpu: "1"
+            memory: 1Gi
+          requests:
+            cpu: 500m
+            memory: 512Mi
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+status:
+  conditions:
+  - lastTransitionTime: "2026-07-14T14:13:42Z"
+    lastUpdateTime: "2026-07-14T14:13:42Z"
+    message: Deployment does not have minimum availability.
+    reason: MinimumReplicasUnavailable
+    status: "False"
+    type: Available
+  - lastTransitionTime: "2026-07-14T16:21:33Z"
+    lastUpdateTime: "2026-07-14T16:21:33Z"
+    message: ReplicaSet "evaluation-service-8455c6dcfc" is progressing.
+    reason: ReplicaSetUpdated
+    status: "True"
+    type: Progressing
+  observedGeneration: 7
+  replicas: 3
+  terminatingReplicas: 0
+  unavailableReplicas: 3
+  updatedReplicas: 1

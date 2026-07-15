@@ -1,0 +1,65 @@
+ - awscli v2.35.21
+ - chocolatey-compatibility.extension v1.0.0
+ - chocolatey-core.extension v1.4.0
+ - chocolatey-dotnetfx.extension v1.0.1
+ - docker-desktop v4.81.0.20260709
+ - dotnetfx v4.8.0.20220524
+ - git v2.55.0.2
+ - git.install v2.55.0.2
+ - KB2919355 v1.0.20160915
+ - KB2919442 v1.0.20160915
+ - kubernetes-cli v1.36.2
+ - kubernetes-helm v4.1.4
+ - terraform v1.15.8
+ - vscode v1.128.0
+ - vscode.install v1.128.0
+
+
+aws configure
+# AWS Access Key ID: REPLACE_WITH_AWS_ACCESS_KEY_ID
+# AWS Secret Access Key: REPLACE_WITH_AWS_SECRET_ACCESS_KEY
+# Default region name: sa-east-1
+# Default output format: json
+
+
+lfmsfiap
+Felipe1337
+
+Chave de acesso
+REPLACE_WITH_AWS_ACCESS_KEY_ID
+
+Chave de acesso secreta
+REPLACE_WITH_AWS_SECRET_ACCESS_KEY
+
+Token GIT Hub
+REPLACE_WITH_GITHUB_PAT
+
+image: 905418203619.dkr.ecr.sa-east-1.amazonaws.com/auth-service:latest
+
+aws ecr get-login-password --region sa-east-1 | docker login --username AWS --password-stdin 905418203619.dkr.ecr.sa-east-1.amazonaws.com
+aws sts get-caller-identity --query Account --output text
+
+cd auth-service
+docker build -t auth-service:latest .
+docker tag auth-service:latest 905418203619.dkr.ecr.sa-east1.amazonaws.com/auth-service:latest
+docker push 905418203619.dkr.ecr.sa-east-1.amazonaws.com/auth-service:latest
+
+cd analytics-service
+docker build -t analytics-service:latest .
+docker tag auth-service:latest 905418203619.dkr.ecr.sa-east1.amazonaws.com/analytics-service:latest
+docker push 905418203619.dkr.ecr.sa-east-1.amazonaws.com/analytics-service:latest
+
+cd evaluation-service
+docker build -t evaluation-service:latest .
+docker tag auth-service:latest 905418203619.dkr.ecr.sa-east1.amazonaws.com/evaluation-service:latest
+docker push 905418203619.dkr.ecr.sa-east-1.amazonaws.com/evaluation-service:latest
+
+cd flag-service
+docker build -t flag-service:latest .
+docker tag auth-service:latest 905418203619.dkr.ecr.sa-east1.amazonaws.com/flag-service:latest
+docker push 905418203619.dkr.ecr.sa-east-1.amazonaws.com/flag-service:latest
+
+cd analytics-service
+docker build -t analytics-service:latest .
+docker tag auth-service:latest 905418203619.dkr.ecr.sa-east1.amazonaws.com/targeting-service:latest
+docker push 905418203619.dkr.ecr.sa-east-1.amazonaws.com/targeting-service:latest

@@ -1,0 +1,77 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: evaluation-service
+  namespace: togglemaster
+  labels:
+    app: evaluation-service
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: evaluation-service
+  template:
+    metadata:
+      labels:
+        app: evaluation-service
+    spec:
+      containers:
+      - name: evaluation-service
+        image: 905418203619.dkr.ecr.sa-east-1.amazonaws.com/evaluation-service:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8004
+          protocol: TCP
+        env:
+        - name: REDIS_HOST
+          valueFrom:
+            configMapKeyRef:
+              key: REDIS_HOST
+              name: app-config
+        - name: REDIS_PORT
+          valueFrom:
+            configMapKeyRef:
+              key: REDIS_PORT
+              name: app-config
+        - name: REDIS_URL
+          valueFrom:
+            configMapKeyRef:
+              key: REDIS_URL
+              name: app-config
+        - name: FLAG_SERVICE_URL
+          valueFrom:
+            configMapKeyRef:
+              key: FLAG_SERVICE_URL
+              name: app-config
+        - name: TARGETING_SERVICE_URL
+          valueFrom:
+            configMapKeyRef:
+              key: TARGETING_SERVICE_URL
+              name: app-config
+        - name: AWS_REGION
+          valueFrom:
+            configMapKeyRef:
+              key: AWS_REGION
+              name: app-config
+        - name: AWS_SQS_URL
+          valueFrom:
+            configMapKeyRef:
+              key: AWS_SQS_URL
+              name: app-config
+        resources:
+          limits:
+            cpu: 1
+            memory: 1Gi
+          requests:
+            cpu: 500m
+            memory: 512Mi
+        livenessProbe:
+          tcpSocket:
+            port: 8004
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        readinessProbe:
+          tcpSocket:
+            port: 8004
+          initialDelaySeconds: 5
+          periodSeconds: 10

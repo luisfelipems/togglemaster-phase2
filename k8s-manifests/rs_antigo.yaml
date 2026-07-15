@@ -1,0 +1,97 @@
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  annotations:
+    deployment.kubernetes.io/desired-replicas: "2"
+    deployment.kubernetes.io/max-replicas: "3"
+    deployment.kubernetes.io/revision: "12"
+  creationTimestamp: "2026-07-14T18:36:32Z"
+  generation: 4
+  labels:
+    app: auth-service
+    pod-template-hash: 7b6bf7c97c
+  name: auth-service-7b6bf7c97c
+  namespace: togglemaster
+  ownerReferences:
+  - apiVersion: apps/v1
+    blockOwnerDeletion: true
+    controller: true
+    kind: Deployment
+    name: auth-service
+    uid: 358a8846-2606-460f-aae7-a18779ba65b1
+  resourceVersion: "82682"
+  uid: 6cac9e14-5bef-4136-bd58-4c4ee8fb8066
+spec:
+  replicas: 0
+  selector:
+    matchLabels:
+      app: auth-service
+      pod-template-hash: 7b6bf7c97c
+  template:
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/restartedAt: "2026-07-14T15:37:46-03:00"
+      labels:
+        app: auth-service
+        pod-template-hash: 7b6bf7c97c
+    spec:
+      containers:
+      - env:
+        - name: DB_HOST
+          valueFrom:
+            configMapKeyRef:
+              key: AUTH_DB_HOST
+              name: app-config
+        - name: DB_PORT
+          valueFrom:
+            configMapKeyRef:
+              key: AUTH_DB_PORT
+              name: app-config
+        - name: DB_NAME
+          valueFrom:
+            configMapKeyRef:
+              key: AUTH_DB_NAME
+              name: app-config
+        - name: DB_USER
+          value: postgres
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: DB_PASSWORD
+              name: db-auth-credentials
+        - name: AWS_REGION
+          valueFrom:
+            configMapKeyRef:
+              key: AWS_REGION
+              name: app-config
+        - name: AWS_SQS_URL
+          valueFrom:
+            configMapKeyRef:
+              key: AWS_SQS_URL
+              name: app-config
+        - name: AWS_DYNAMODB_TABLE
+          valueFrom:
+            configMapKeyRef:
+              key: AWS_DYNAMODB_TABLE
+              name: app-config
+        image: 905418203619.dkr.ecr.sa-east-1.amazonaws.com/auth-service:latest
+        imagePullPolicy: IfNotPresent
+        name: auth-service
+        ports:
+        - containerPort: 8001
+          protocol: TCP
+        resources:
+          requests:
+            cpu: 250m
+            memory: 256Mi
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+status:
+  observedGeneration: 4
+  replicas: 0
+  terminatingReplicas: 0

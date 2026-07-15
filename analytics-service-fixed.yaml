@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: analytics-service
+  namespace: togglemaster
+  labels:
+    app: analytics-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: analytics-service
+  template:
+    metadata:
+      labels:
+        app: analytics-service
+    spec:
+      containers:
+      - name: analytics-service
+        image: 905418203619.dkr.ecr.sa-east-1.amazonaws.com/analytics-service:latest
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: AWS_REGION
+          valueFrom:
+            configMapKeyRef:
+              key: DYNAMODB_REGION
+              name: app-config
+        - name: DYNAMODB_TABLE
+          valueFrom:
+            configMapKeyRef:
+              key: DYNAMODB_TABLE
+              name: app-config
+        - name: AWS_SQS_URL
+          valueFrom:
+            configMapKeyRef:
+              key: SQS_QUEUE_URL
+              name: app-config
+        - name: AWS_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              key: AWS_ACCESS_KEY_ID
+              name: aws-credentials
+        - name: AWS_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              key: AWS_SECRET_ACCESS_KEY
+              name: aws-credentials
+        - name: AWS_DYNAMODB_TABLE
+          valueFrom:
+            configMapKeyRef:
+              key: AWS_DYNAMODB_TABLE
+              name: app-config
+        resources:
+          requests:
+            cpu: 250m
+            memory: 256Mi
