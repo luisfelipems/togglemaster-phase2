@@ -5,10 +5,12 @@ on:
     branches: [ main ]
     paths:
       - 'togglemaster-phase2/auth-service/**'
+      - '.github/workflows/ci-cd.yaml'
   push:
     branches: [ main ]
     paths:
       - 'togglemaster-phase2/auth-service/**'
+      - '.github/workflows/ci-cd.yaml'
 
 env:
   AWS_REGION: sa-east-1
