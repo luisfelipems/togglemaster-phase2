@@ -67,6 +67,7 @@ jobs:
         with:
           working-directory: togglemaster-phase2/auth-service
           version: latest
+          install-mode: goinstall
           args: --timeout=5m
 
   security-scan:
