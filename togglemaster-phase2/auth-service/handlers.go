@@ -22,10 +22,10 @@ type CreateKeyResponse struct {
 // healthHandler é um simples endpoint de verificação de saúde
 func (a *App) healthHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
-if err := json.NewEncoder(w).Encode(map[string]string{"message": "Chave válida"}); err != nil {
-	log.Printf("Erro ao codificar resposta de validacao da chave: %v", err)
+	if err := json.NewEncoder(w).Encode(map[string]string{"status": "ok"}); err != nil {
+		log.Printf("Erro ao codificar resposta do health check: %v", err)
+	}
 }
-
 // validateKeyHandler verifica se uma chave de API (enviada via Header) é válida
 func (a *App) validateKeyHandler(w http.ResponseWriter, r *http.Request) {
 	// Extrai a chave do header "Authorization: Bearer <key>"
@@ -52,7 +52,9 @@ func (a *App) validateKeyHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Chave válida
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(map[string]string{"message": "Chave válida"})
+	if err := json.NewEncoder(w).Encode(map[string]string{"message": "Chave válida"}); err != nil {
+		log.Printf("Erro ao codificar resposta de validacao da chave: %v", err)
+	}
 }
 
 // createKeyHandler cria uma nova chave de API
