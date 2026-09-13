@@ -26,6 +26,7 @@ func (a *App) healthHandler(w http.ResponseWriter, r *http.Request) {
 		log.Printf("Erro ao codificar resposta do health check: %v", err)
 	}
 }
+
 // validateKeyHandler verifica se uma chave de API (enviada via Header) é válida
 func (a *App) validateKeyHandler(w http.ResponseWriter, r *http.Request) {
 	// Extrai a chave do header "Authorization: Bearer <key>"
@@ -97,13 +98,14 @@ func (a *App) createKeyHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	log.Printf("Nova chave criada com sucesso (ID: %d, Name: %s)", newID, req.Name)
-w.WriteHeader(http.StatusCreated)
-if err := json.NewEncoder(w).Encode(CreateKeyResponse{
-	Name:    req.Name,
-	Key:     newKey,
-	Message: "Guarde esta chave com segurança! Você não poderá vê-la novamente.",
-}); err != nil {
-	log.Printf("Erro ao codificar resposta de criacao da chave: %v", err)
+	w.WriteHeader(http.StatusCreated)
+	if err := json.NewEncoder(w).Encode(CreateKeyResponse{
+		Name:    req.Name,
+		Key:     newKey, // Retorna a chave em texto plano pela última vez
+		Message: "Guarde esta chave com segurança! Você não poderá vê-la novamente.",
+	}); err != nil {
+		log.Printf("Erro ao codificar resposta de criacao da chave: %v", err)
+	}
 }
 
 // --- Middleware ---
@@ -118,7 +120,7 @@ func (a *App) masterKeyAuthMiddleware(next http.Handler) http.Handler {
 			http.Error(w, "Acesso não autorizado", http.StatusForbidden)
 			return
 		}
-		// Se a chave for válida, continua para o handler principal
+
 		next.ServeHTTP(w, r)
 	})
 }
