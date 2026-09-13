@@ -64,6 +64,7 @@ jobs:
         uses: golangci/golangci-lint-action@v6
         with:
           working-directory: togglemaster-phase2/auth-service
+          version: latest
           args: --timeout=5m
 
   security-scan:
